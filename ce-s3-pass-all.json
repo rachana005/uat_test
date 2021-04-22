@@ -1,16 +1,56 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "MainBucket": {
+            "Type": "String",
+            "Default": "cen-iac-bucket-test-mum"
+        },
+        "LoggingBucket": {
+            "Type": "String",
+            "Default": "cen-iac-log-bucket-test-mum"
+        }
+    },
     "Resources": {
-        "S3Bucket": {
-            "Type": "AWS::S3::Bucket"
+        "S3MainBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "AccessControl": "Private",
+                "BucketName": {
+                    "Ref": "MainBucket"
+                },
+                "LoggingConfiguration": {
+                    "DestinationBucketName": {
+                        "Ref": "LoggingBucket"
+                    }
+                },
+                "BucketEncryption": {
+                    "ServerSideEncryptionConfiguration": [
+                        {
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "aws:kms",
+                                "KMSMasterKeyID": "arn:aws:kms:ap-south-1:566236728573:key/1ccaa5ac-3437-4047-b248-b27f85ae66dc"
+                            }
+                        }
+                    ]
+                },
+                "PublicAccessBlockConfiguration": {
+                    "IgnorePublicAcls": true,
+                    "BlockPublicAcls": true,
+                    "BlockPublicPolicy": true,
+                    "RestrictPublicBuckets": true
+                },
+                "VersioningConfiguration": {
+                    "Status": "Enabled"
+                }
+            }
         }
     },
     "Outputs": {
-        "BucketName": {
+        "MainBucketName": {
             "Value": {
-                "Ref": "S3Bucket"
+                "Ref": "S3MainBucket"
             },
-            "Description": "Name of the sample Amazon S3 bucket."
+            "Description": "Name of the sample Amazon S3 bucket with a logging configuration."
         }
     }
 }
